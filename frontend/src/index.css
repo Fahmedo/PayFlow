@@ -1,0 +1,49 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f0f14;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+button:hover { opacity: 0.85; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+input {
+  background: #1e1e2e;
+  border: 1px solid #2d2d3f;
+  border-radius: 8px;
+  color: #e2e8f0;
+  padding: 10px 14px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+input:focus { border-color: #7c3aed; }
+
+.card {
+  background: #1a1a2e;
+  border: 1px solid #2d2d3f;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.badge-active { background: #14532d; color: #4ade80; }
+.badge-inactive { background: #3f1515; color: #f87171; }
