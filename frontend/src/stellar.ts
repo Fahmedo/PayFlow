@@ -54,7 +54,7 @@ async function buildTx(
 
   // assembleTransaction attaches the soroban data / auth entries
   const { assembleTransaction } = await import("@stellar/stellar-sdk/rpc");
-  const assembled = assembleTransaction(tx, simResult);
+  const assembled = assembleTransaction(tx, simResult) as unknown as { toXDR(): string };
   return assembled.toXDR();
 }
 
