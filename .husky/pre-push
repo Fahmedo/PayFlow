@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+npm run backend:typecheck
+npm run backend:test
