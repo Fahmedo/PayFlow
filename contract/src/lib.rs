@@ -1,10 +1,11 @@
 #![no_std]
 
+mod events;
 mod test;
 
 use soroban_sdk::{
     contract, contractimpl, contracttype,
-    token, Address, Env, Symbol,
+    token, Address, Env,
 };
 
 // ── Storage keys ──────────────────────────────────────────────────────────────
@@ -72,10 +73,7 @@ impl FlowPay {
             .persistent()
             .set(&DataKey::Subscription(user.clone()), &sub);
 
-        env.events().publish(
-            (Symbol::new(&env, "subscribed"), user),
-            (sub.merchant, sub.amount, sub.interval),
-        );
+        events::publish_subscribed(&env, &user, &sub);
     }
 
     /// Charge a user's subscription.
@@ -118,10 +116,7 @@ impl FlowPay {
         sub.last_charged = now;
         env.storage().persistent().set(&key, &sub);
 
-        env.events().publish(
-            (Symbol::new(&env, "charged"), user),
-            (sub.merchant, sub.amount, now),
-        );
+        events::publish_charged(&env, &user, &sub, now);
     }
 
     /// Pay-per-use microtransaction — charge an arbitrary amount right now,
@@ -154,10 +149,7 @@ impl FlowPay {
             &amount,
         );
 
-        env.events().publish(
-            (Symbol::new(&env, "pay_per_use"), user),
-            (sub.merchant, amount),
-        );
+        events::publish_pay_per_use(&env, &user, &sub.merchant, amount);
     }
 
     /// Cancel a subscription. Only the subscriber can cancel.
@@ -174,8 +166,7 @@ impl FlowPay {
         sub.active = false;
         env.storage().persistent().set(&key, &sub);
 
-        env.events()
-            .publish((Symbol::new(&env, "cancelled"), user), ());
+        events::publish_cancelled(&env, &user);
     }
 
     /// Read a subscription (view function).
