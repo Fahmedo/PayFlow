@@ -26,6 +26,7 @@ pub struct Subscription {
     pub interval: u64,      // seconds between charges
     pub last_charged: u64,  // ledger timestamp of last charge
     pub active: bool,
+    pub paused: bool,       // true if user has temporarily halted charges
 }
 
 // ── Contract ──────────────────────────────────────────────────────────────────
@@ -66,6 +67,7 @@ impl FlowPay {
             interval,
             last_charged: env.ledger().timestamp(),
             active: true,
+            paused: false,
         };
 
         env.storage()
@@ -92,6 +94,7 @@ impl FlowPay {
             .expect("no subscription found");
 
         assert!(sub.active, "subscription is not active");
+        assert!(!sub.paused, "subscription is paused");
 
         let now = env.ledger().timestamp();
         assert!(
@@ -139,6 +142,7 @@ impl FlowPay {
             .expect("no subscription found");
 
         assert!(sub.active, "subscription is not active");
+        assert!(!sub.paused, "subscription is paused");
 
         let token_addr: Address = env
             .storage()
@@ -176,6 +180,51 @@ impl FlowPay {
 
         env.events()
             .publish((Symbol::new(&env, "cancelled"), user), ());
+    }
+
+    /// Pause a subscription. Only the subscriber can pause.
+    ///
+    /// While paused, `charge()` and `pay_per_use()` will panic.
+    /// The subscription record is preserved and can be resumed at any time.
+    pub fn pause(env: Env, user: Address) {
+        user.require_auth();
+
+        let key = DataKey::Subscription(user.clone());
+        let mut sub: Subscription = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .expect("no subscription found");
+
+        assert!(sub.active, "subscription is not active");
+        assert!(!sub.paused, "subscription is already paused");
+
+        sub.paused = true;
+        env.storage().persistent().set(&key, &sub);
+
+        env.events()
+            .publish((Symbol::new(&env, "paused"), user), ());
+    }
+
+    /// Resume a paused subscription. Only the subscriber can resume.
+    pub fn resume(env: Env, user: Address) {
+        user.require_auth();
+
+        let key = DataKey::Subscription(user.clone());
+        let mut sub: Subscription = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .expect("no subscription found");
+
+        assert!(sub.active, "subscription is not active");
+        assert!(sub.paused, "subscription is not paused");
+
+        sub.paused = false;
+        env.storage().persistent().set(&key, &sub);
+
+        env.events()
+            .publish((Symbol::new(&env, "resumed"), user), ());
     }
 
     /// Read a subscription (view function).

@@ -83,3 +83,53 @@ fn test_charge_too_early() {
     client.subscribe(&user, &merchant, &1_0000000, &86400);
     client.charge(&user); // immediately — should panic
 }
+
+#[test]
+#[should_panic(expected = "subscription is paused")]
+fn test_pause_prevents_charge() {
+    let (env, contract_id, _token_addr, user, merchant) = setup();
+    let client = FlowPayClient::new(&env, &contract_id);
+
+    let interval: u64 = 86400;
+    client.subscribe(&user, &merchant, &1_0000000, &interval);
+    client.pause(&user);
+
+    let sub = client.get_subscription(&user).unwrap();
+    assert!(sub.paused);
+
+    // Advance past interval — charge should still panic because paused
+    env.ledger().with_mut(|l| {
+        l.timestamp += interval + 1;
+    });
+
+    client.charge(&user);
+}
+
+#[test]
+fn test_resume_allows_charge() {
+    let (env, contract_id, _token_addr, user, merchant) = setup();
+    let client = FlowPayClient::new(&env, &contract_id);
+
+    let interval: u64 = 86400;
+    client.subscribe(&user, &merchant, &1_0000000, &interval);
+    client.pause(&user);
+
+    let sub = client.get_subscription(&user).unwrap();
+    assert!(sub.paused);
+
+    client.resume(&user);
+
+    let sub = client.get_subscription(&user).unwrap();
+    assert!(!sub.paused);
+
+    // Advance past interval — charge should now succeed
+    env.ledger().with_mut(|l| {
+        l.timestamp += interval + 1;
+    });
+
+    client.charge(&user);
+
+    let sub_after = client.get_subscription(&user).unwrap();
+    assert!(!sub_after.paused);
+    assert!(sub_after.last_charged > 0);
+}
