@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useWallet } from "./hooks/useWallet";
 import SubscribeForm from "./components/SubscribeForm";
 import Dashboard from "./components/Dashboard";
+import TabBar from "./components/TabBar";
 
 export default function App() {
   const { publicKey, connect, signAndSubmit, error } = useWallet();
@@ -20,19 +21,7 @@ export default function App() {
 
       {/* Wallet connect */}
       {!publicKey ? (
-        <div className="card" style={{ textAlign: "center" }}>
-          <p style={{ color: "var(--color-text-muted)", marginBottom: "var(--space-4)", fontSize: "var(--text-base)" }}>
-            Connect your Freighter wallet to get started.
-          </p>
-          <button
-            onClick={connect}
-            className="btn-primary"
-            style={{ width: "100%" }}
-          >
-            Connect Wallet
-          </button>
-          {error && <p style={{ color: "var(--color-danger)", marginTop: "var(--space-3)", fontSize: "var(--text-sm)" }}>{error}</p>}
-        </div>
+        <ConnectWallet onConnect={connect} error={error} />
       ) : (
         <>
           {/* Connected bar */}
@@ -44,18 +33,11 @@ export default function App() {
           </div>
 
           {/* Tabs */}
-          <div className="tab-bar">
-            {(["dashboard", "subscribe"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                /* Dynamic: active class is state-driven — className expression is intentional */
-                className={`tab-button${tab === t ? " tab-button--active" : ""}`}
-              >
-                {t === "dashboard" ? "Dashboard" : "Subscribe"}
-              </button>
-            ))}
-          </div>
+          <TabBar
+            tabs={["dashboard", "subscribe"]}
+            activeTab={tab}
+            onTabChange={setTab}
+          />
 
           {/* Content */}
           <div className="card">
