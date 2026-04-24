@@ -262,6 +262,36 @@ input::placeholder {
 .p-6 { padding: var(--space-6); }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   Connect Wallet Component
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.connect-wallet {
+  text-align: center;
+}
+
+.connect-wallet__hint {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-base);
+}
+
+.connect-wallet__install-link {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Text Utilities
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.text-error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  margin-top: var(--space-3);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    Layout Utilities
    ───────────────────────────────────────────────────────────────────────────── */
 
