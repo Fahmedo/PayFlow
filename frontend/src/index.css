@@ -262,39 +262,31 @@ input::placeholder {
 .p-6 { padding: var(--space-6); }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Tab Bar
+   Skeleton / Shimmer
    ───────────────────────────────────────────────────────────────────────────── */
 
-.tab-bar {
-  display: flex;
-  gap: var(--space-2);
-  margin-bottom: var(--space-5);
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
 
-.tab-button {
-  flex: 1;
-  background: var(--color-surface-overlay);
-  color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-5);
-  font-size: var(--text-base);
-  font-weight: var(--font-semibold);
-  font-family: inherit;
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-}
-
-.tab-button:hover:not(.tab-button--active) {
+.skeleton {
   background: var(--color-surface-raised);
-  color: var(--color-text);
-  border-color: var(--color-border-light);
+  border-radius: var(--radius-sm);
+  height: var(--space-4);
 }
 
-.tab-button--active {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--color-surface-raised) 25%,
+      var(--color-border-light)   50%,
+      var(--color-surface-raised) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
